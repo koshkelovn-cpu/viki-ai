@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VIKI AI — ხმოვანი AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Noto+Sans+Georgian:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   VIKI AI — Hero
+   Font stack: Space Grotesk (Latin) → Noto Sans Georgian (Georgian glyphs)
+   ============================================================ */
+:root {
+  --bg: #050507;
+  --text: #ffffff;
+  --muted: #9A9AA5;
+  --border: rgba(255,255,255,0.09);
+  --glass: rgba(10,10,14,0.72);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --font: "Space Grotesk", "Noto Sans Georgian", system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Starfield canvas ---- */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---- Floating navbar ---- */
+.nav-wrap {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: min(1180px, calc(100% - 32px));
+}
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 9px 18px 9px 14px;
+  background: var(--glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: white;
+  flex-shrink: 0;
+}
+.logo img {
+  height: 28px;
+  width: auto;
+  display: block;
+  mix-blend-mode: screen; /* kills near-black background of logo.png */
+}
+.logo-text {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.nav-links {
+  display: flex;
+  gap: 26px;
+  list-style: none;
+  margin: 0 auto;
+}
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s var(--ease);
+}
+.nav-links a:hover,
+.nav-links a:focus-visible { color: white; }
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 20px;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: all 0.3s var(--ease);
+}
+.btn-primary {
+  background: #fff;
+  color: #0a0a0a;
+}
+.btn-primary:hover { background: #f2f2f2; transform: translateY(-1px); }
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid transparent;
+}
+.btn-ghost:hover { color: white; }
+.burger {
+  display: none;
+  width: 38px; height: 38px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* ---- Hero layout ---- */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 130px 48px 80px;
+  gap: 32px;
+}
+.hero-content {
+  max-width: 460px;
+  position: relative;
+  z-index: 2;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.7s var(--ease) 0.25s forwards;
+}
+h1 {
+  font-size: clamp(36px, 4.6vw, 56px);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  margin-bottom: 18px;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: fadeUp 0.7s var(--ease) 0.4s forwards;
+}
+.sub {
+  font-size: 16.5px;
+  color: var(--muted);
+  max-width: 400px;
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: fadeUp 0.7s var(--ease) 0.55s forwards;
+}
+.cta-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: fadeUp 0.7s var(--ease) 0.7s forwards;
+}
+.btn-secondary {
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.22);
+}
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.04);
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  gap: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.7s var(--ease) 0.85s forwards;
+}
+.stat {
+  padding: 0 22px;
+  border-right: 1px solid var(--border);
+}
+.stat:first-child { padding-left: 0; }
+.stat:last-child { border-right: none; }
+.stat-value {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 3px;
+}
+
+/* ---- Orb stage ---- */
+.orb-stage {
+  position: relative;
+  width: min(52vw, 86vh);
+  max-width: 640px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.orb-inner {
+  position: relative;
+  width: 78%;
+  height: 78%;
+}
+#orb-png,
+#orb-canvas,
+#orb-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  border-radius: 50%;
+}
+#orb-png { z-index: 1; }
+#orb-canvas { z-index: 2; opacity: 0; transition: opacity 0.5s; }
+#orb-video { display: none; } /* hidden source for WebGL */
+
+.orb-status {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.orb-status .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #7ec8ff;
+  box-shadow: 0 0 8px #7ec8ff;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Service nodes */
+.service-node {
+  position: absolute;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: inherit;
+  z-index: 5;
+  transition: transform 0.35s var(--ease);
+}
+.service-node:hover,
+.service-node:focus-visible {
+  transform: translateY(-4px);
+}
+.service-node img,
+.service-node .fallback-icon {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  border-radius: 50%;
+  transition: filter 0.3s;
+}
+.service-node:hover img,
+.service-node:focus-visible img {
+  filter: brightness(1.25);
+}
+.service-node .label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  transition: color 0.3s;
+  text-align: center;
+  white-space: nowrap;
+}
+.service-node:hover .label,
+.service-node:focus-visible .label { color: white; }
+.fallback-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  font-size: 18px;
+  color: #ccc;
+}
+
+/* SVG cables */
+#cables {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+  overflow: visible;
+}
+
+/* Polar grid (faint) */
+.polar-grid {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.04);
+  pointer-events: none;
+  z-index: 0;
+}
+.polar-grid::before,
+.polar-grid::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.polar-grid::after { inset: 36%; }
+
+/* Coordinate readout */
+.coord {
+  position: fixed;
+  bottom: 18px;
+  left: 24px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+  font-variant-numeric: tabular-nums;
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* Corner crosshairs (technical detail) */
+.crosshair {
+  position: fixed;
+  width: 12px; height: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  pointer-events: none;
+  z-index: 40;
+}
+.crosshair.tl { top: 16px; left: 16px; border-right: none; border-bottom: none; }
+.crosshair.tr { top: 16px; right: 16px; border-left: none; border-bottom: none; }
+.crosshair.bl { bottom: 16px; left: 16px; border-right: none; border-top: none; }
+.crosshair.br { bottom: 16px; right: 16px; border-left: none; border-top: none; }
+
+/* Mobile */
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .burger { display: flex; align-items: center; justify-content: center; }
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 110px 20px 60px;
+    text-align: center;
+  }
+  .hero-content { max-width: 100%; margin: 0 auto; order: 2; }
+  .sub { margin-left: auto; margin-right: auto; }
+  .cta-row { justify-content: center; }
+  .stats { justify-content: center; }
+  .orb-stage {
+    order: 1;
+    width: min(88vw, 42vh);
+    margin-bottom: 36px;
+  }
+  .service-node { width: 48px; }
+  .service-node img, .service-node .fallback-icon { width: 44px; height: 44px; }
+  .service-node .label { font-size: 10px; }
+  h1 { font-size: 34px; }
+}
+@media (max-width: 480px) {
+  .nav { padding: 8px 12px; gap: 10px; }
+  .btn { height: 36px; padding: 0 16px; font-size: 13px; }
+  .stats { flex-direction: column; gap: 14px; align-items: center; }
+  .stat { border: none; padding: 0; text-align: center; }
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .orb-status .dot { animation: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="starfield" aria-hidden="true"></canvas>
+
+<div class="crosshair tl"></div>
+<div class="crosshair tr"></div>
+<div class="crosshair bl"></div>
+<div class="crosshair br"></div>
+<div class="coord" id="coord">X 0.500  Y 0.500</div>
+
+<!-- NAV – Georgian labels exact -->
+<div class="nav-wrap">
+  <nav class="nav">
+    <a href="/" class="logo" aria-label="VIKI AI">
+      <img src="assets/logo.png" alt="" width="28" height="28"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'" />
+      <span class="logo-fallback" style="display:none;font-size:18px">◈</span>
+      <span class="logo-text">VIKI AI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#why">რატომ ჩვენ?</a></li>
+      <li><a href="#pricing">ფასი</a></li>
+      <li><a href="#faq">კითხვები</a></li>
+      <li><a href="#about">ჩვენს შესახებ</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn btn-primary" id="demoBtn">დემო ზარი</button>
+      <a href="#login" class="btn btn-ghost">შესვლა</a>
+      <button class="burger" aria-label="მენიუ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<section class="hero">
+  <div class="hero-content">
+    <p class="eyebrow">// VIKI AI ENTERPRISE PLATFORM</p>
+    <h1>ხმოვანი AI, რომელიც პასუხობს ზარებს</h1>
+    <p class="sub">ათასობით ერთდროული საუბარი. ნატურალური ქართული. ნულოვანი ლოდინი.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" id="demoBtn2">დემო ზარი</button>
+      <button class="btn btn-secondary" id="sampleBtn">მოისმინე ნიმუში</button>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" data-target="99.8">0</div>
+        <div class="stat-label">Accuracy</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" data-target="0.95">0</div>
+        <div class="stat-label">Latency</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" data-target="10000">0</div>
+        <div class="stat-label">Calls/Hour</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="orb-stage" id="orbStage">
+    <div class="polar-grid"></div>
+    <svg id="cables" aria-hidden="true"></svg>
+
+    <div class="orb-inner" id="orbInner">
+      <!-- PNG first (always present, fallback) -->
+      <img id="orb-png" src="assets/orb.png" alt="" aria-hidden="true"
+           onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Ccircle cx=%22200%22 cy=%22200%22 r=%22160%22 fill=%22%23111%22 stroke=%22%23444%22 stroke-width=%222%22/%3E%3C/svg%3E'" />
+      <canvas id="orb-canvas" aria-hidden="true"></canvas>
+      <video id="orb-video" muted playsinline loop preload="auto" poster="assets/orb.png" aria-hidden="true">
+        <source src="assets/orb.webm" type="video/webm" />
+        <source src="assets/orb.mp4" type="video/mp4" />
+      </video>
+    </div>
+
+    <div class="orb-status" id="orbStatus">
+      <span class="dot"></span>
+      <span id="statusText">ისმენს…</span>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   CONFIG – all tunable values in one place
+   ============================================================ */
+const CONFIG = {
+  // TODO: replace with real verified numbers before launch
+  stats: { accuracy: 99.8, latency: 0.95, calls: 10000 },
+
+  USE_VIDEO: true,               // false → PNG only + CSS proximity
+  WATERMARK_MASK: true,          // hide CapCut Ai watermark (top-left)
+
+  // Proximity / pinch
+  proximityRadius: 1.65,         // × orb radius
+  pinchStrength: 0.18,           // max radial contraction
+  chromaticMax: 3.0,             // px RGB separation
+  cursorPull: 10,                // max px pull toward pointer
+  springDamping: 0.085,          // critically damped feel
+
+  // Services (add a new channel = one object)
+  services: [
+    { id: "phone",     label: "ტელეფონი",   icon: "assets/icons/phone.webp",     angle: -95 },
+    { id: "instagram", label: "Instagram",  icon: "assets/icons/instagram.webp", angle: -40 },
+    { id: "facebook",  label: "Facebook",   icon: "assets/icons/facebook.webp",  angle: 10 },
+    { id: "viber",     label: "Viber",      icon: "assets/icons/viber.webp",     angle: 55 },
+    { id: "email",     label: "ელფოსტა",    icon: "assets/icons/email.webp",     angle: 110 },
+    { id: "whatsapp",  label: "WhatsApp",   icon: "assets/icons/whatsapp.webp",  angle: 160 },
+    { id: "messenger", label: "Messenger",  icon: "assets/icons/messenger.webp", angle: 210 }
+  ],
+
+  // Starfield
+  starDust: 1600,
+  starMain: 340,
+  flareInterval: 1000,           // ms ±150
+  constellationPct: 0.28,
+
+  // Cable pulses
+  pulseIntervalMin: 1500,
+  pulseIntervalMax: 4000
+};
+
+/* ============================================================
+   STARFIELD + CONSTELLATIONS
+   ============================================================ */
+(function Starfield() {
+  const canvas = document.getElementById("starfield");
+  const ctx = canvas.getContext("2d");
+  let w, h, dpr, stars = [], constellations = [], flares = [];
+  let mouse = { x: 0.5, y: 0.5 };
+  let staticLayer = null;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    build();
+  }
+
+  function seeded(i) {
+    const x = Math.sin(i * 127.1 + 311.7) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  function build() {
+    const isMobile = w < 900;
+    const dustN = isMobile ? Math.floor(CONFIG.starDust * 0.4) : CONFIG.starDust;
+    const mainN = isMobile ? Math.floor(CONFIG.starMain * 0.4) : CONFIG.starMain;
+
+    stars = [];
+    for (let i = 0; i < dustN; i++) {
+      stars.push({
+        x: seeded(i) * w, y: seeded(i + 99) * h,
+        r: 0.4 + seeded(i + 7) * 0.5,
+        a: 0.08 + seeded(i + 13) * 0.12,
+        layer: 0
+      });
+    }
+    for (let i = 0; i < mainN; i++) {
+      stars.push({
+        x: seeded(i + 200) * w, y: seeded(i + 300) * h,
+        r: 0.9 + seeded(i + 17) * 0.9,
+        a: 0.25 + seeded(i + 23) * 0.3,
+        layer: 1,
+        id: i
+      });
+    }
+
+    // Constellations (stable)
+    constellations = [];
+    const mainStars = stars.filter(s => s.layer === 1);
+    const used = new Set();
+    const target = Math.floor(mainStars.length * CONFIG.constellationPct / 4);
+    for (let c = 0; c < target; c++) {
+      const seed = c * 17;
+      let start = Math.floor(seeded(seed) * mainStars.length);
+      if (used.has(start)) continue;
+      const chain = [start];
+      used.add(start);
+      let cur = start;
+      const len = 3 + Math.floor(seeded(seed + 1) * 5);
+      for (let k = 0; k < len; k++) {
+        let best = -1, bestD = 1e9;
+        for (let j = 0; j < mainStars.length; j++) {
+          if (used.has(j)) continue;
+          const dx = mainStars[j].x - mainStars[cur].x;
+          const dy = mainStars[j].y - mainStars[cur].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 180 && d < bestD) { bestD = d; best = j; }
+        }
+        if (best < 0) break;
+        chain.push(best);
+        used.add(best);
+        cur = best;
+      }
+      if (chain.length >= 3) constellations.push(chain.map(i => mainStars[i]));
+    }
+
+    // Pre-render static layer
+    staticLayer = document.createElement("canvas");
+    staticLayer.width = w * dpr;
+    staticLayer.height = h * dpr;
+    const sctx = staticLayer.getContext("2d");
+    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    sctx.fillStyle = "#050507";
+    sctx.fillRect(0, 0, w, h);
+
+    // Vignette + left text mask (darker on left)
+    const g = sctx.createRadialGradient(w * 0.65, h * 0.5, 0, w * 0.65, h * 0.5, Math.max(w, h) * 0.75);
+    g.addColorStop(0, "rgba(0,0,0,0)");
+    g.addColorStop(1, "rgba(0,0,0,0.55)");
+    sctx.fillStyle = g;
+    sctx.fillRect(0, 0, w, h);
+
+    stars.forEach(s => {
+      sctx.beginPath();
+      sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      sctx.fillStyle = `rgba(255,255,255,${s.a * (s.x < w * 0.42 ? 0.4 : 1)})`;
+      sctx.fill();
+    });
+    constellations.forEach(chain => {
+      sctx.beginPath();
+      sctx.moveTo(chain[0].x, chain[0].y);
+      for (let i = 1; i < chain.length; i++) sctx.lineTo(chain[i].x, chain[i].y);
+      sctx.strokeStyle = "rgba(255,255,255,0.06)";
+      sctx.lineWidth = 0.6;
+      sctx.stroke();
+    });
+  }
+
+  let lastFlare = 0;
+  function tick(t) {
+    if (document.hidden) { requestAnimationFrame(tick); return; }
+    ctx.clearRect(0, 0, w, h);
+    if (staticLayer) ctx.drawImage(staticLayer, 0, 0, w, h);
+
+    if (!reduced) {
+      // Flares
+      if (t - lastFlare > CONFIG.flareInterval + (Math.random() - 0.5) * 300) {
+        lastFlare = t;
+        const main = stars.filter(s => s.layer === 1);
+        if (main.length) {
+          const s = main[Math.floor(Math.random() * main.length)];
+          flares.push({ star: s, birth: t, life: 1600 });
+        }
+      }
+      flares = flares.filter(f => t - f.birth < f.life);
+      flares.forEach(f => {
+        const p = (t - f.birth) / f.life;
+        const a = Math.sin(p * Math.PI) * 0.95;
+        const r = 4 + Math.sin(p * Math.PI) * 8;
+        ctx.beginPath();
+        ctx.arc(f.star.x, f.star.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220,235,255,${a * 0.35})`;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(f.star.x, f.star.y, f.star.r + 1, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${a})`;
+        ctx.fill();
+      });
+
+      // Cursor interaction zone
+      const mx = mouse.x * w, my = mouse.y * h;
+      stars.forEach(s => {
+        if (s.layer === 0) return;
+        const dx = s.x - mx, dy = s.y - my;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 160) {
+          const force = (1 - d / 160) * 5;
+          ctx.beginPath();
+          ctx.arc(s.x + (mx - s.x) * 0.02, s.y + (my - s.y) * 0.02, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${s.a + force * 0.15})`;
+          ctx.fill();
+        }
+      });
+    }
+    requestAnimationFrame(tick);
+  }
+
+  window.addEventListener("resize", resize);
+  window.addEventListener("pointermove", e => {
+    mouse.x = e.clientX / w;
+    mouse.y = e.clientY / h;
+    document.getElementById("coord").textContent =
+      `X ${mouse.x.toFixed(3)}  Y ${mouse.y.toFixed(3)}`;
+  });
+  resize();
+  requestAnimationFrame(tick);
+})();
+
+/* ============================================================
+   ORB – WebGL pinch + video texture (or PNG fallback)
+   ============================================================ */
+(function Orb() {
+  const stage = document.getElementById("orbStage");
+  const inner = document.getElementById("orbInner");
+  const png = document.getElementById("orb-png");
+  const canvas = document.getElementById("orb-canvas");
+  const video = document.getElementById("orb-video");
+  const statusText = document.getElementById("statusText");
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+                  navigator.connection?.saveData;
+  let gl, program, tex, animId;
+  let p = 0, pTarget = 0;          // proximity 0→1
+  let shock = 0;
+  let state = "idle";              // idle | thinking | speaking
+  let videoReady = false;
+
+  // ---- Simple WebGL setup ----
+  function initGL() {
+    gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false });
+    if (!gl) return false;
+
+    const vs = `
+      attribute vec2 a;
+      varying vec2 v;
+      void main(){ v = a*0.5+0.5; gl_Position = vec4(a,0,1); }`;
+    const fs = `
+      precision mediump float;
+      varying vec2 v;
+      uniform sampler2D uTex;
+      uniform float uP;          // proximity
+      uniform float uShock;
+      uniform float uChrom;
+      uniform float uTime;
+      uniform vec2 uRes;
+      uniform bool uMask;
+
+      void main(){
+        vec2 uv = v;
+        vec2 c = vec2(0.5);
+        float d = distance(uv, c);
+
+        // Radial pinch (contracts toward center)
+        float pinch = uP * 0.18;
+        uv = c + (uv - c) * (1.0 + pinch * smoothstep(0.55, 0.0, d));
+
+        // Shockwave ring
+        float ring = abs(d - (0.15 + uShock * 0.4));
+        float shockDist = 1.0 - smoothstep(0.0, 0.04, ring);
+        uv += normalize(uv - c) * shockDist * 0.012 * uShock;
+
+        // Chromatic aberration along radial
+        vec2 dir = normalize(uv - c + 0.0001);
+        float ch = uChrom * uP;
+        float r = texture2D(uTex, uv + dir * ch * 0.004).r;
+        float g = texture2D(uTex, uv).g;
+        float b = texture2D(uTex, uv - dir * ch * 0.004).b;
+        vec4 col = vec4(r, g, b, texture2D(uTex, uv).a);
+
+        // Watermark mask (top-left ~20% x, 9% y)
+        if (uMask) {
+          float mx = smoothstep(0.22, 0.18, uv.x);
+          float my = smoothstep(0.12, 0.08, 1.0 - uv.y);
+          float mask = mx * my;
+          col.rgb *= 1.0 - mask * 0.97;
+        }
+
+        // Keep pure black transparent for mix-blend-mode:screen
+        float lum = max(col.r, max(col.g, col.b));
+        col.a = smoothstep(0.02, 0.08, lum);
+        gl_FragColor = col;
+      }`;
+
+    function compile(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    }
+    program = gl.createProgram();
+    gl.attachShader(program, compile(gl.VERTEX_SHADER, vs));
+    gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(program);
+    gl.useProgram(program);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(program, "a");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    return true;
+  }
+
+  function resizeCanvas() {
+    const r = inner.getBoundingClientRect();
+    const s = Math.min(r.width, r.height);
+    canvas.width = s * Math.min(devicePixelRatio, 2);
+    canvas.height = canvas.width;
+    canvas.style.width = s + "px";
+    canvas.style.height = s + "px";
+    if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+
+  function updateTexture() {
+    if (!gl || !videoReady) return;
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
+  }
+
+  function render() {
+    if (!gl) return;
+    updateTexture();
+    gl.useProgram(program);
+    gl.uniform1f(gl.getUniformLocation(program, "uP"), p);
+    gl.uniform1f(gl.getUniformLocation(program, "uShock"), shock);
+    gl.uniform1f(gl.getUniformLocation(program, "uChrom"), CONFIG.chromaticMax);
+    gl.uniform1f(gl.getUniformLocation(program, "uTime"), performance.now() * 0.001);
+    gl.uniform2f(gl.getUniformLocation(program, "uRes"), canvas.width, canvas.height);
+    gl.uniform1i(gl.getUniformLocation(program, "uMask"), CONFIG.WATERMARK_MASK ? 1 : 0);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  // Spring
+  function spring(current, target, damp) {
+    return current + (target - current) * damp;
+  }
+
+  function loop() {
+    p = spring(p, pTarget, CONFIG.springDamping);
+    shock = Math.max(0, shock - 0.025);
+    if (state === "speaking") {
+      // subtle scale pulse via CSS on the inner
+      const amp = 1 + Math.sin(performance.now() * 0.012) * 0.018;
+      inner.style.transform = `scale(${amp})`;
+    } else {
+      inner.style.transform = "";
+    }
+    render();
+    animId = requestAnimationFrame(loop);
+  }
+
+  // Pointer proximity
+  function onPointer(e) {
+    const rect = inner.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const radius = rect.width * 0.5 * CONFIG.proximityRadius;
+    pTarget = Math.max(0, 1 - dist / radius);
+
+    // slight pull
+    if (pTarget > 0.05) {
+      const pull = (pTarget * CONFIG.cursorPull);
+      inner.style.translate = `${(dx / dist) * pull * 0.3}px ${(dy / dist) * pull * 0.3}px`;
+    } else {
+      inner.style.translate = "0 0";
+    }
+  }
+
+  function onLeave() {
+    pTarget = 0;
+    inner.style.translate = "0 0";
+  }
+
+  function onClick() {
+    shock = 1.0;
+  }
+
+  // Demo state machine
+  function startDemo() {
+    state = "thinking";
+    statusText.textContent = "ფიქრობს…";
+    setTimeout(() => {
+      state = "speaking";
+      statusText.textContent = "საუბრობს…";
+      // ripple rings
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const ring = document.createElement("div");
+          ring.style.cssText = `
+            position:absolute; inset:10%; border-radius:50%;
+            border:1px solid rgba(126,200,255,0.4);
+            pointer-events:none; z-index:4;
+            animation: ripple 0.9s var(--ease) forwards;`;
+          inner.appendChild(ring);
+          setTimeout(() => ring.remove(), 950);
+        }, i * 180);
+      }
+      setTimeout(() => {
+        state = "idle";
+        statusText.textContent = "ისმენს…";
+      }, 5500);
+    }, 1100);
+  }
+
+  // CSS fallback proximity when no WebGL / reduced
+  function cssProximity(e) {
+    const rect = inner.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+    const radius = rect.width * 0.8;
+    const near = dist < radius;
+    png.style.transform = near ? "scale(0.88)" : "scale(1)";
+    png.style.filter = near ? "brightness(0.92)" : "brightness(1)";
+    png.style.transition = "transform 0.6s var(--ease), filter 0.6s var(--ease)";
+  }
+
+  // Boot
+  function boot() {
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    if (reduced || !CONFIG.USE_VIDEO) {
+      // PNG only
+      canvas.style.display = "none";
+      stage.addEventListener("pointermove", cssProximity);
+      stage.addEventListener("pointerleave", () => {
+        png.style.transform = "scale(1)";
+        png.style.filter = "brightness(1)";
+      });
+      return;
+    }
+
+    const ok = initGL();
+    if (!ok) {
+      canvas.style.display = "none";
+      stage.addEventListener("pointermove", cssProximity);
+      return;
+    }
+
+    video.addEventListener("loadeddata", () => {
+      videoReady = true;
+      video.play().catch(() => {});
+      canvas.style.opacity = "1";
+      // keep PNG underneath as safety
+    });
+    video.load();
+
+    stage.addEventListener("pointermove", onPointer);
+    stage.addEventListener("pointerleave", onLeave);
+    stage.addEventListener("click", onClick);
+    stage.addEventListener("touchstart", onClick, { passive: true });
+
+    loop();
+  }
+
+  document.getElementById("demoBtn").addEventListener("click", startDemo);
+  document.getElementById("demoBtn2").addEventListener("click", startDemo);
+
+  // Inject ripple keyframes
+  const style = document.createElement("style");
+  style.textContent = `@keyframes ripple {
+    from { transform: scale(0.7); opacity: 0.7; }
+    to   { transform: scale(1.6); opacity: 0; }
+  }`;
+  document.head.appendChild(style);
+
+  boot();
+})();
+
+/* ============================================================
+   SERVICE NODES + ENERGY CABLES
+   ============================================================ */
+(function Services() {
+  const stage = document.getElementById("orbStage");
+  const svg = document.getElementById("cables");
+  const nodes = [];
+
+  function place() {
+    const rect = stage.getBoundingClientRect();
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rx = rect.width * 0.46;
+    const ry = rect.height * 0.44;
+
+    // Clear previous
+    stage.querySelectorAll(".service-node").forEach(n => n.remove());
+    svg.innerHTML = "";
+
+    CONFIG.services.forEach((svc, i) => {
+      const rad = (svc.angle * Math.PI) / 180;
+      const x = cx + Math.cos(rad) * rx;
+      const y = cy + Math.sin(rad) * ry;
+
+      const btn = document.createElement("button");
+      btn.className = "service-node";
+      btn.style.left = x - 32 + "px";
+      btn.style.top = y - 32 + "px";
+      btn.setAttribute("aria-label", svc.label);
+      btn.innerHTML = `
+        <img src="${svc.icon}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="fallback-icon" style="display:none">${svc.label[0]}</div>
+        <span class="label">${svc.label}</span>`;
+      stage.appendChild(btn);
+      nodes.push({ el: btn, x, y, svc });
+
+      // Cable path (quadratic to anchor ring)
+      const anchorR = Math.min(rect.width, rect.height) * 0.13;
+      const ax = cx + Math.cos(rad) * anchorR;
+      const ay = cy + Math.sin(rad) * anchorR;
+      const mx = (x + ax) / 2 + (Math.random() - 0.5) * 20;
+      const my = (y + ay) / 2 + (Math.random() - 0.5) * 20;
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", `M ${x} ${y} Q ${mx} ${my} ${ax} ${ay}`);
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", "rgba(255,255,255,0.055)");
+      path.setAttribute("stroke-width", "5");
+      path.setAttribute("stroke-linecap", "round");
+      svg.appendChild(path);
+
+      const core = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      core.setAttribute("d", path.getAttribute("d"));
+      core.setAttribute("fill", "none");
+      core.setAttribute("stroke", "rgba(255,255,255,0.16)");
+      core.setAttribute("stroke-width", "1");
+      core.setAttribute("stroke-linecap", "round");
+      svg.appendChild(core);
+
+      // Energy pulse (stroke-dash)
+      const pulse = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pulse.setAttribute("d", path.getAttribute("d"));
+      pulse.setAttribute("fill", "none");
+      pulse.setAttribute("stroke", "url(#pulseGrad)");
+      pulse.setAttribute("stroke-width", "2.5");
+      pulse.setAttribute("stroke-linecap", "round");
+      pulse.setAttribute("stroke-dasharray", "18 120");
+      pulse.style.opacity = "0";
+      svg.appendChild(pulse);
+
+      // Random pulse schedule
+      function schedule() {
+        const delay = CONFIG.pulseIntervalMin + Math.random() * (CONFIG.pulseIntervalMax - CONFIG.pulseIntervalMin);
+        setTimeout(() => {
+          pulse.style.opacity = "0.9";
+          pulse.style.transition = "none";
+          pulse.setAttribute("stroke-dashoffset", "140");
+          requestAnimationFrame(() => {
+            pulse.style.transition = "stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s";
+            pulse.setAttribute("stroke-dashoffset", "-40");
+            setTimeout(() => { pulse.style.opacity = "0"; }, 1300);
+          });
+          schedule();
+        }, delay);
+      }
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) schedule();
+
+      // Hover status
+      btn.addEventListener("mouseenter", () => {
+        document.getElementById("statusText").textContent = `${svc.label} · პასუხი გაიგზავნა`;
+      });
+      btn.addEventListener("mouseleave", () => {
+        if (document.getElementById("statusText").textContent.includes("პასუხი")) {
+          document.getElementById("statusText").textContent = "ისმენს…";
+        }
+      });
+    });
+
+    // Gradient def
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.innerHTML = `<linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(180,220,255,0)" />
+      <stop offset="40%" stop-color="rgba(180,220,255,0.95)" />
+      <stop offset="100%" stop-color="rgba(140,200,255,0)" />
+    </linearGradient>`;
+    svg.prepend(defs);
+  }
+
+  window.addEventListener("resize", () => {
+    nodes.length = 0;
+    place();
+  });
+  // Delay to let layout settle
+  setTimeout(place, 100);
+})();
+
+/* ============================================================
+   STATS COUNT-UP
+   ============================================================ */
+(function Stats() {
+  const els = document.querySelectorAll(".stat-value");
+  const obs = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    els.forEach(el => {
+      const target = parseFloat(el.dataset.target);
+      const isFloat = target < 10;
+      const start = performance.now();
+      const dur = 1600;
+      function frame(now) {
+        const t = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - t, 3);
+        let v = target * eased;
+        if (isFloat) el.textContent = v.toFixed(2) + (target === 0.95 ? "ms" : "");
+        else if (target >= 1000) el.textContent = Math.floor(v).toLocaleString() + "+";
+        else el.textContent = v.toFixed(1) + "%";
+        if (t < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
+    obs.disconnect();
+  }, { threshold: 0.4 });
+  obs.observe(document.querySelector(".stats"));
+})();
+</script>
+</body>
+</html>
